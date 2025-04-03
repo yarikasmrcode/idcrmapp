@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { Lesson } from "@/lib/types";
 
 export default function AdminLessonsPage() {
-  const [lessons, setLessons] = useState([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]); // ✅ Add type here
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]); // ✅ Initialize teachers state
 
