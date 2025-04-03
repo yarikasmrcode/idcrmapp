@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, Trash2 } from "lucide-react";
+import { Lesson } from "@/lib/types";
 
 export default function LessonsPage() {
   const [lessons, setLessons] = useState([]);
@@ -58,19 +59,17 @@ export default function LessonsPage() {
     fetchStudents();
   }, []);
 
-  function handleEditClick(lesson) {
-    // 🔍 Find the student info based on the student_id
+  function handleEditClick(lesson: Lesson) {
     const studentInfo = students.find((s) => s.id === lesson.student_id);
   
     setSelectedLesson({
       ...lesson,
       student_id: lesson.student?.id || lesson.student_id || "",
-      student: studentInfo ? studentInfo : { id: "", full_name: "Select Student" } // ✅ Ensure student has a name
+      student: studentInfo ? studentInfo : { id: "", full_name: "Select Student" }
     });
   
     setEditDialogOpen(true);
   }
-  
 
   async function handleAddLesson() {
     if (!newLesson.student) {
