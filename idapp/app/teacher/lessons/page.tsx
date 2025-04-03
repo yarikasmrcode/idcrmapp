@@ -104,8 +104,9 @@ export default function LessonsPage() {
       setLessons((prev) => [...prev, {
         ...responseData,
         student: {
-          full_name: studentInfo ? studentInfo.full_name : "Unknown",
-        },
+          full_name: studentInfo?.full_name || "Unknown",
+          username: studentInfo?.username || "unknown_user", // ✅ Fix the build!
+        },        
       }].sort((a, b) => new Date(a.time_slot) - new Date(b.time_slot))); 
   
       setDialogOpen(false);
@@ -181,7 +182,10 @@ export default function LessonsPage() {
 
   const filteredLessons = lessons.filter((lesson) => {
     const matchesSearch =
-      searchQuery === "" || lesson.student?.full_name.toLowerCase().includes(searchQuery);
+      searchQuery === "" ||
+      (lesson.student?.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lesson.student?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()));
+
     const matchesType =
       selectedFilters.type.length === 0 || selectedFilters.type.includes(lesson.type);
     const matchesStatus =
