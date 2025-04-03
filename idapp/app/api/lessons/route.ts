@@ -19,7 +19,7 @@ export async function GET() {
     payment_status,
     reasonforcancellation,
     student_id,
-    student:students(full_name)  -- ✅ Join student name from "students" table
+    student:students(full_name, username)
   `)
   .eq("teacher_id", userId);
 
