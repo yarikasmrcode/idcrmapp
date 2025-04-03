@@ -38,22 +38,18 @@ export default function AdminLessonsPage() {
   
     return matchesTeacher && matchesStudent && matchesPayment && matchesStatus && matchesSearch;
   });
-  
 
-
-
-  function handleEditClick(lesson) {
-    // 🔍 Find the student info based on the student_id
+  function handleEditClick(lesson: Lesson) {
     const studentInfo = students.find((s) => s.id === lesson.student_id);
   
     setSelectedLesson({
       ...lesson,
       student_id: lesson.student?.id || lesson.student_id || "",
-      student: studentInfo ? studentInfo : { id: "", full_name: "Select Student" } // ✅ Ensure student has a name
+      student: studentInfo ? studentInfo : { id: "", full_name: "Select Student" }
     });
   
     setEditDialogOpen(true);
-  }
+  }  
 
   async function handleEditLesson() {
     if (!selectedLesson) return;
