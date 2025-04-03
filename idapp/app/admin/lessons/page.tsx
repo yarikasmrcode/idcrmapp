@@ -44,7 +44,7 @@ export default function AdminLessonsPage() {
   
     setSelectedLesson({
       ...lesson,
-      student_id: lesson.student?.id || lesson.student_id || "",
+      student_id: lesson.student_id || "",
       student: studentInfo ? studentInfo : { id: "", full_name: "Select Student" }
     });
   
