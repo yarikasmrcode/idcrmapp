@@ -10,7 +10,7 @@ import { Lesson } from "@/lib/types";
 
 export default function AdminLessonsPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]); // ✅ Add type here
-  const [students, setStudents] = useState([]);
+  const [students, setStudents] = useState<{ id: string; full_name: string; username?: string }[]>([]);
   const [teachers, setTeachers] = useState([]); // ✅ Initialize teachers state
 
   const [loading, setLoading] = useState(true);
