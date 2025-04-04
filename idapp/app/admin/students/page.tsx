@@ -7,15 +7,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Trash2, Pencil } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Student, Teacher } from "@/lib/types";
 
 const STUDENTS_PER_PAGE = 8; // ✅ Max students per page
 
 export default function AdminStudentsPage() {
-  const [students, setStudents] = useState([]);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [studentToDelete, setStudentToDelete] = useState(null);
 
   // New state for pagination and filter
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,17 +24,17 @@ export default function AdminStudentsPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [teachers, setTeachers] = useState([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState(""); // Stores the selected teacher's ID
-
 
 
   /** 🔹 Filter Students Based on Search & Regular Status */
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
-      searchQuery === "" ||
-      student.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.full_name.toLowerCase().includes(searchQuery.toLowerCase());
+    searchQuery === "" ||
+    student.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    student.full_name.toLowerCase().includes(searchQuery.toLowerCase());
+  
     
     const matchesRegular =
       regularFilter === "all" ||
@@ -82,13 +83,13 @@ export default function AdminStudentsPage() {
   }, []);
 
   // ✅ Open edit dialog
-  function handleEditClick(student) {
+  function handleEditClick(student : Student) {
     setSelectedStudent(student);
     setEditDialogOpen(true);
   }
 
   // ✅ Open delete confirmation dialog
-  function handleDeleteClick(student) {
+  function handleDeleteClick(student : Student) {
     setStudentToDelete(student);
     setDeleteDialogOpen(true);
   }

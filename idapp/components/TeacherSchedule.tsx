@@ -7,17 +7,25 @@ import { ChevronLeft, ChevronRight, Trash2, CheckCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Lesson, Student } from "@/lib/types";
 
 const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+
+type Slot = {
+  day: string;
+  time: string;
+  lesson: Lesson | null;
+};
+
 
 export default function TeacherSchedule() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const startOfCurrentWeek = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startOfCurrentWeek, i));
 
-  const [lessons, setLessons] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [newLesson, setNewLesson] = useState({ student: "", type: "", duration: "" });
 
   useEffect(() => {
@@ -48,9 +56,14 @@ export default function TeacherSchedule() {
     fetchStudents();
   }, []);
 
-  const handleSlotClick = (day, time, lesson = null) => {
+  const handleSlotClick = (
+    day: string,
+    time: string,
+    lesson: Lesson | null = null
+  ) => {
     setSelectedSlot({ day, time, lesson });
   };
+  
 
   async function handleAddLesson() {
     if (!newLesson.student || !newLesson.type || !newLesson.duration || !selectedSlot) return;

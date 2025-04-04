@@ -8,21 +8,26 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, Trash2 } from "lucide-react";
-import { Lesson } from "@/lib/types";
+import { Lesson, Student } from "@/lib/types";
 
 export default function LessonsPage() {
-  const [lessons, setLessons] = useState([]);
-  const [students, setStudents] = useState([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedLesson, setSelectedLesson] = useState(null);
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [newLesson, setNewLesson] = useState({ student: "", type: "", lessonlink : "",duration: "", timeSlot: "", status: "", paymentStatus: "" });
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilters, setSelectedFilters] = useState({
+  const [selectedFilters, setSelectedFilters] = useState<{
+    type: string[];
+    status: string[];
+    payment: string[];
+  }>({
     type: [],
     status: [],
     payment: [],
   });
+  
   
   useEffect(() => {
     async function fetchLessons() {
@@ -33,8 +38,9 @@ export default function LessonsPage() {
   
         // ✅ Sort lessons from earliest to latest based on time_slot
         const sortedLessons = lessonsData.sort(
-          (a, b) => new Date(a.time_slot) - new Date(b.time_slot)
-        );
+      (a: Lesson, b: Lesson) => new Date(a.time_slot).getTime() - new Date(b.time_slot).getTime()
+  );
+
   
         setLessons(sortedLessons);
       } catch (error) {
@@ -64,12 +70,21 @@ export default function LessonsPage() {
   
     setSelectedLesson({
       ...lesson,
-      student_id: lesson.student?.id || lesson.student_id || "",
-      student: studentInfo ? studentInfo : { id: "", full_name: "Select Student" }
+      student_id: lesson.student_id || "",
+      student: studentInfo ?? {
+        id: "",
+        full_name: "Select Student",
+        username: "",
+        teacher_id: "",
+        level: "",
+        description: "",
+        isregular: false,
+      },
     });
   
     setEditDialogOpen(true);
   }
+  
 
   async function handleAddLesson() {
     if (!newLesson.student) {
@@ -99,14 +114,16 @@ export default function LessonsPage() {
     if (response.ok) {
       const studentInfo = students.find((s) => s.id === newLesson.student);
   
-      // ✅ Insert new lesson in the right order
-      setLessons((prev) => [...prev, {
-        ...responseData,
-        student: {
-          full_name: studentInfo?.full_name || "Unknown",
-          username: studentInfo?.username || "unknown_user", // ✅ Fix the build!
-        },        
-      }].sort((a, b) => new Date(a.time_slot) - new Date(b.time_slot))); 
+      setLessons((prev) =>
+        [...prev, {
+          ...responseData,
+          student: {
+            full_name: studentInfo?.full_name || "Unknown",
+            username: studentInfo?.username || "unknown_user",
+          },
+        }].sort((a, b) => new Date(a.time_slot).getTime() - new Date(b.time_slot).getTime())
+      );
+      
   
       setDialogOpen(false);
       setNewLesson({ student: "", type: "", lessonlink: "",duration: "", timeSlot: "", status: "", paymentStatus: "" });
@@ -128,7 +145,7 @@ export default function LessonsPage() {
         id: selectedLesson.id,
         student_id: selectedLesson.student_id, 
         type: selectedLesson.type,
-        duration: parseInt(selectedLesson.duration), 
+        duration: selectedLesson.duration,
         time_slot: selectedLesson.time_slot ? new Date(selectedLesson.time_slot).toISOString() : null,
         status: selectedLesson.status,
         payment_status: selectedLesson.payment_status,
@@ -162,7 +179,7 @@ export default function LessonsPage() {
   }
   
   
-  async function handleDeleteLesson(lessonId) {
+  async function handleDeleteLesson(lessonId: string) {
     console.log("🗑️ Deleting lesson:", lessonId);
   
     const response = await fetch(`/api/lessons`, {
@@ -197,7 +214,7 @@ export default function LessonsPage() {
   });
 
   /** ✅ Handle filter toggles */
-  const handleFilterChange = (category, value) => {
+  const handleFilterChange = (category: keyof typeof selectedFilters, value: string) => {
     setSelectedFilters((prevFilters) => {
       const updatedFilters = { ...prevFilters };
       if (updatedFilters[category].includes(value)) {
@@ -519,11 +536,24 @@ export default function LessonsPage() {
                 value={selectedLesson?.student_id || ""}
                 onValueChange={(value) => {
                   const studentInfo = students.find((s) => s.id === value);
-                  setSelectedLesson((prev) => ({
-                    ...prev,
-                    student_id: value,
-                    student: studentInfo ? studentInfo : { id: "", full_name: "Unknown" }
-                  }));
+                  setSelectedLesson((prev) => {
+                    if (!prev) return prev;
+                  
+                    return {
+                      ...prev,
+                      student_id: value,
+                      student: studentInfo ?? {
+                        id: "",
+                        full_name: "Unknown",
+                        username: "",
+                        teacher_id: "",
+                        level: "",
+                        description: "",
+                        isregular: false,
+                      },
+                    };
+                  });
+                  
                 }}
               >
                 <SelectTrigger>
@@ -579,11 +609,17 @@ export default function LessonsPage() {
               {/* 🔹 Status */}
               <Select
                 value={selectedLesson.status}
-                onValueChange={(value) => setSelectedLesson((prev) => ({
-                  ...prev,
-                  status: value,
-                  reasonforcancellation: value === "Cancelled" ? prev.reasonforcancellation || "" : "" // Reset reason if not cancelled
-                }))}
+                onValueChange={(value) =>setSelectedLesson((prev) => {
+                  if (!prev) return prev;
+                
+                  return {
+                    ...prev,
+                    id: prev.id ?? "", // make sure ID is present
+                    status: value,
+                    reasonforcancellation: value === "Cancelled" ? prev.reasonforcancellation || "" : "",
+                  };
+                })}
+                
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select Status" />

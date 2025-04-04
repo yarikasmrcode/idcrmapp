@@ -26,8 +26,12 @@ export async function POST(req: Request) {
 
     console.log("✅ User added to Supabase: ", email);
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("❌ Webhook Error: ", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    console.error("❌ Webhook Error:", error);
+  
+    const message = error instanceof Error ? error.message : "Unknown error";
+  
+    return NextResponse.json({ error: message }, { status: 500 });
   }
+  
 }

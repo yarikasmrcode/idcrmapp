@@ -17,7 +17,9 @@ export default function Navbar() {
         <>
           <p className="text-gray-900 text-sm">
             {user.primaryEmailAddress?.emailAddress} <br />
-            <span className="font-semibold text-blue-600">{user.publicMetadata?.role || "Loading..."}</span>
+            <span className="font-semibold text-blue-600">
+  {typeof user.publicMetadata?.role === "string" ? user.publicMetadata.role : "Loading..."}
+</span>
           </p>
 
           <h1 className="text-2xl mb-18 font-bold text-gray-900 mt-12">ID English CRM</h1>

@@ -7,13 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Pencil, Trash2 } from "lucide-react";
+import { Student } from "@/lib/types";
 
 const STUDENTS_PER_PAGE = 8; // ✅ Max students per page
 
 
 export default function Students() {
-  const [students, setStudents] = useState([]);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [editableStudent, setEditableStudent] = useState<Student | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -25,9 +28,7 @@ export default function Students() {
     isregular: false,
   });
 
-  const [editableStudent, setEditableStudent] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Controls delete modal
-  const [studentToDelete, setStudentToDelete] = useState(null); // Stores the student being deleted
 
   // New state for pagination and filter
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,7 +40,7 @@ export default function Students() {
       const [errors, setErrors] = useState({ full_name: "", username: "", level: "", description: "" });
 
   // Open delete confirmation dialog
-  function handleDeleteClick(student) {
+  function handleDeleteClick(student : Student) {
     setStudentToDelete(student);
     setDeleteDialogOpen(true);
   }
@@ -59,9 +60,10 @@ export default function Students() {
   /** 🔹 Filter Students Based on Search & Regular Status */
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
-      searchQuery === "" ||
-      student.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.full_name.toLowerCase().includes(searchQuery.toLowerCase());
+    searchQuery === "" ||
+    (student.username ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    student.full_name.toLowerCase().includes(searchQuery.toLowerCase());
+  
     
     const matchesRegular =
       regularFilter === "all" ||
@@ -162,7 +164,7 @@ export default function Students() {
     }
   }
 
-  async function handleDeleteStudent(studentId) {
+  async function handleDeleteStudent(studentId : string) {
     console.log("🗑️ Deleting student:", studentId);
   
     const response = await fetch(`/api/students`, {
@@ -201,18 +203,20 @@ export default function Students() {
   }
   
 
-  function handleEditClick(student) {
+  function handleEditClick(student: Student) {
     setSelectedStudent({
       id: student.id,
       full_name: student.full_name || "",
       username: student.username || "",
       level: student.level || "",
       description: student.description || "",
-      isregular: student.isregular ?? false, // ✅ Default to false
+      isregular: student.isregular ?? false,
+      teacher_id: student.teacher_id || "", // ✅ Fix added here
     });
   
     setEditDialogOpen(true);
   }
+  
    {
      {
       
@@ -412,9 +416,13 @@ export default function Students() {
                   </div>
                 )}
                 <div className="flex justify-end gap-2 mt-4">
-                  <Button onClick={handleDeleteStudent} className="text-xs sm:text-sm">
-                    Delete
-                  </Button>
+                <Button
+                  onClick={() => handleDeleteStudent(studentToDelete?.id || "")}
+                  className="text-xs sm:text-sm"
+                >
+                  Delete
+                </Button>
+
                   <Button
                     onClick={() => {
                       setEditableStudent(selectedStudent);
@@ -438,39 +446,112 @@ export default function Students() {
                   <Input
                     type="text"
                     value={selectedStudent?.full_name || ""}
-                    onChange={(e) => setSelectedStudent({ ...selectedStudent, full_name: e.target.value })}
+                    onChange={(e) =>
+                      setSelectedStudent((prev) =>
+                        prev
+                          ? { ...prev, full_name: e.target.value }
+                          : {
+                              id: "", // Provide defaults if `prev` is null (shouldn't happen in this case)
+                              teacher_id: "",
+                              full_name: e.target.value,
+                              username: "",
+                              level: "",
+                              description: "",
+                              isregular: false,
+                            }
+                      )
+                    }
                     className="w-full text-xs sm:text-sm"
                   />
                   <Input
                     type="text"
                     value={selectedStudent?.username || ""}
-                    onChange={(e) => setSelectedStudent({ ...selectedStudent, username: e.target.value })}
-                    className="w-full text-xs sm:text-sm"
+                    onChange={(e) =>
+                      setSelectedStudent((prev) =>
+                        prev
+                          ? { ...prev, username: e.target.value }
+                          : {
+                              id: "",
+                              teacher_id: "",
+                              full_name: "",
+                              username: e.target.value,
+                              level: "",
+                              description: "",
+                              isregular: false,
+                            }
+                      )
+                    }
+                                        className="w-full text-xs sm:text-sm"
                   />
                   <Input
-                    type="text"
-                    value={selectedStudent?.level || ""}
-                    onChange={(e) => setSelectedStudent({ ...selectedStudent, level: e.target.value })}
-                    className="w-full text-xs sm:text-sm"
-                  />
-                  <Input
-                    type="text"
-                    value={selectedStudent?.description || ""}
-                    onChange={(e) => setSelectedStudent({ ...selectedStudent, description: e.target.value })}
-                    className="w-full text-xs sm:text-sm"
-                  />
-                  <Select
-                    value={selectedStudent?.isregular?.toString() || "false"}
-                    onValueChange={(value) => setSelectedStudent({ ...selectedStudent, isregular: value === "true" })}
-                  >
-                    <SelectTrigger className="w-full text-xs sm:text-sm">
-                      <SelectValue placeholder="Is Regular?" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Yes</SelectItem>
-                      <SelectItem value="false">No</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  type="text"
+                  value={selectedStudent?.level || ""}
+                  onChange={(e) =>
+                    setSelectedStudent((prev) =>
+                      prev
+                        ? { ...prev, level: e.target.value }
+                        : {
+                            id: "",
+                            teacher_id: "",
+                            full_name: "",
+                            username: "",
+                            level: e.target.value,
+                            description: "",
+                            isregular: false,
+                          }
+                    )
+                  }
+                  className="w-full text-xs sm:text-sm"
+                />
+
+                <Input
+                  type="text"
+                  value={selectedStudent?.description || ""}
+                  onChange={(e) =>
+                    setSelectedStudent((prev) =>
+                      prev
+                        ? { ...prev, description: e.target.value }
+                        : {
+                            id: "",
+                            teacher_id: "",
+                            full_name: "",
+                            username: "",
+                            level: "",
+                            description: e.target.value,
+                            isregular: false,
+                          }
+                    )
+                  }
+                  className="w-full text-xs sm:text-sm"
+                />
+
+                <Select
+                  value={selectedStudent?.isregular?.toString() || "false"}
+                  onValueChange={(value) =>
+                    setSelectedStudent((prev) =>
+                      prev
+                        ? { ...prev, isregular: value === "true" }
+                        : {
+                            id: "",
+                            teacher_id: "",
+                            full_name: "",
+                            username: "",
+                            level: "",
+                            description: "",
+                            isregular: value === "true",
+                          }
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-full text-xs sm:text-sm">
+                    <SelectValue placeholder="Is Regular?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">Yes</SelectItem>
+                    <SelectItem value="false">No</SelectItem>
+                  </SelectContent>
+                </Select>
+
                 </div>
                 <div className="flex justify-end gap-2 mt-4">
                   <Button

@@ -6,11 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lesson, Teacher } from "@/lib/types";
+import { Lesson, Teacher, Student } from "@/lib/types";
 
 export default function AdminLessonsPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]); // ✅ Add type here
-  const [students, setStudents] = useState<{ id: string; full_name: string; username?: string }[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -18,11 +18,10 @@ export default function AdminLessonsPage() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(null);
-  const [selectedLessonStatus, setSelectedLessonStatus] = useState(null);
-      
+  const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string | null>(null);
+  const [selectedLessonStatus, setSelectedLessonStatus] = useState<string | null>(null);      
       
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -322,11 +321,16 @@ export default function AdminLessonsPage() {
                   value={selectedLesson?.student_id || ""}
                   onValueChange={(value) => {
                     const studentInfo = students.find((s) => s.id === value);
-                    setSelectedLesson((prev) => ({
-                      ...prev,
-                      student_id: value,
-                      student: studentInfo || { id: "", full_name: "Unknown" },
-                    }));
+                    setSelectedLesson((prev) => {
+                      if (!prev) return prev;
+                    
+                      return {
+                        ...prev,
+                        student_id: value,
+                        student: studentInfo || { id: "", full_name: "Unknown", username: "" }, // add `username` to match the full type
+                      };
+                    });
+                    
                   }}
                 >
                   <SelectTrigger className="w-full p-3 border-gray-300 rounded-lg">
@@ -400,12 +404,16 @@ export default function AdminLessonsPage() {
                 <Select
                   value={selectedLesson.status}
                   onValueChange={(value) =>
-                    setSelectedLesson((prev) => ({
-                      ...prev,
-                      status: value,
-                      reasonforcancellation:
-                        value === "Cancelled" ? prev.reasonforcancellation || "" : "",
-                    }))
+                    setSelectedLesson((prev) => {
+                      if (!prev) return prev; // 💡 safely do nothing if prev is null
+                    
+                      return {
+                        ...prev,
+                        status: value,
+                        reasonforcancellation:
+                          value === "Cancelled" ? prev.reasonforcancellation || "" : "",
+                      };
+                    })                    
                   }
                 >
                   <SelectTrigger className="w-full p-3 border-gray-300 rounded-lg">

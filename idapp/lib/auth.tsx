@@ -27,7 +27,7 @@ export function useAuth() {
     }
     if (user) {
       // ✅ Get role from Clerk's `publicMetadata`
-      setRole(user.publicMetadata?.role || "teacher"); // Default to "teacher" if role is missing
+      setRole(user.publicMetadata?.role as string || "teacher");
     }
   }, [isSignedIn, user, router]);
 

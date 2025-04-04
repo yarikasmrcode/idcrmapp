@@ -11,7 +11,7 @@ export interface Lesson {
   teacher_id: string;
   student?: {
     full_name: string;
-    username: string;
+    username?: string;
   };
   teacher?: {
     full_name: string;
@@ -20,4 +20,13 @@ export interface Lesson {
 export interface Teacher {
   id: string;
   full_name: string;
+}
+export interface Student {
+  id: string;
+  teacher_id: string;
+  full_name: string;
+  level: string;
+  description: string;
+  isregular: boolean;
+  username?: string; // optional
 }
