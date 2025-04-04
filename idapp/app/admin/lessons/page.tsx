@@ -42,11 +42,12 @@ export default function AdminLessonsPage() {
   function handleEditClick(lesson: Lesson) {
     const studentInfo = students.find((s) => s.id === lesson.student_id);
   
-    setSelectedLesson({
+    setSelectedLesson(() => ({
       ...lesson,
       student_id: lesson.student_id || "",
-      student: studentInfo ? studentInfo : { id: "", full_name: "Select Student" }
-    });
+      student: studentInfo ? studentInfo : { id: "", full_name: "Select Student" },
+    }));
+    
   
     setEditDialogOpen(true);
   }  
