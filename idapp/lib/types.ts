@@ -11,7 +11,7 @@ export interface Lesson {
   teacher_id: string;
   student?: {
     full_name: string;
-    username: string; // ✅ Add this line!
+    username?: string; // ✅ Add this line!
   };
   teacher?: {
     full_name: string;
