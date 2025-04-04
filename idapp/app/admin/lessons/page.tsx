@@ -16,12 +16,12 @@ export default function AdminLessonsPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedLesson, setSelectedLesson] = useState(null);
-
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
+  
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(null);
-    const [selectedLessonStatus, setSelectedLessonStatus] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(null);
+  const [selectedLessonStatus, setSelectedLessonStatus] = useState(null);
       
       
   const [searchQuery, setSearchQuery] = useState("");
