@@ -65,7 +65,7 @@ export default function AdminLessonsPage() {
         student_id: selectedLesson.student_id,
         teacher_id: selectedLesson.teacher_id, // Add teacher_id to the request
         type: selectedLesson.type,
-        duration: parseInt(selectedLesson.duration),
+        duration: Number(selectedLesson.duration),
         time_slot: selectedLesson.time_slot ? new Date(selectedLesson.time_slot).toISOString() : null,
         status: selectedLesson.status,
         payment_status: selectedLesson.payment_status,
