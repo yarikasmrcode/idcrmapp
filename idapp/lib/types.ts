@@ -11,9 +11,13 @@ export interface Lesson {
   teacher_id: string;
   student?: {
     full_name: string;
-    username?: string; // ✅ Add this line!
+    username: string;
   };
   teacher?: {
     full_name: string;
-  };
+  }; // optional if you're planning to display teacher names
+}
+export interface Teacher {
+  id: string;
+  full_name: string;
 }

@@ -6,12 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lesson } from "@/lib/types";
+import { Lesson, Teacher } from "@/lib/types";
 
 export default function AdminLessonsPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]); // ✅ Add type here
   const [students, setStudents] = useState<{ id: string; full_name: string; username?: string }[]>([]);
-  const [teachers, setTeachers] = useState([]); // ✅ Initialize teachers state
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
